@@ -1,4 +1,13 @@
-composer require laravel/socialite
+# Login with Github and Facebook account using Laravel Socialite using laravel 7.
+
+source:
+
+https://laravel.com/docs/7.x/socialite
+
+https://laracasts.com/series/learn-socialite/episodes/1
+
+`composer require laravel/socialite`
+
 4.4.1
 
 -   Installing league/oauth1-client (1.7.0): Downloading (100%)
@@ -6,37 +15,86 @@ composer require laravel/socialite
 
 https://laravel.com/docs/7.x/socialite
 
-in config/services.php add for github for example
+# login with Github
+
+go to:
+
+github.com=yourpage
+settings
+developer settings
+OAuth apps
+New OAuth app
+fill the needed data
+register application
+
+register, and create an app name. you get an ID, and a secret. This ones should you fill in your .env file.
+
+## in config/services.php add for github for example
 
 'github' => [
 'client_id' => env('GITHUB_CLIENT_ID'),
 'client_secret' => env('GITHUB_CLIENT_SECRET'),
-'redirect' => 'http://your-callback-url',
-],
+'redirect' => 'http://localhost:8000/login/github/callback', ],
 
-composer require laravel/ui
+## in. env:
 
-php artisan ui bootstrap --auth
+## in .inv fill the data you got from github:
 
-npm install && npm run dev
+GITHUB_CLIENT_ID=
+
+GITHUB_CLIENT_SECRET=
+
+## then :
+
+`composer require laravel/ui`
+
+`php artisan ui bootstrap --auth`
+
+`npm install && npm run dev`
+
 (it installs vue-template-compiler)
 
-in App\Http\Controllers\Auth\LoginController.php:
+## in App\Http\Controllers\Auth\LoginController.php:
 
-A number of OAuth providers support optional parameters in the redirect request. To include any optional parameters in the request, call the with method with an associative array:
+public function redirectToProvider()
+{
+return Socialite::driver('github')->redirect();
+}
 
-return Socialite::driver('google')
-->with(['hd' => 'example.com'])
-->redirect();
+public function handleProviderCallback()
+{
 
-The stateless method may be used to disable session state verification. This is useful when adding social authentication to an API:
+         $githubUser = Socialite::driver('github')->user();
+        // $user->token;
 
-return Socialite::driver('google')->stateless()->user();
+        //User create:
+        $user = User::firstOrCreate(
+            [
+
+            'provider_id' => $githubUser->getId()
+
+            ],
+            [
+            'email' => $githubUser->getEmail(),
+            'name' => $githubUser->getName(),
+            // 'avatar' => $githubUser->getAvatar(),
+
+            ]
+        );
+
+        //Log the user in:
+        auth()->login($user, true);
+
+        //redirect to dashboard
+        return redirect('home');
+    }
 
 ---
 
-in routes add:
+## in routes add:
+
 Route::get('login/github', 'Auth\LoginController@redirectToProvider');
+
 Route::get('login/github/callback', 'Auth\LoginController@handleProviderCallback');
 
 ---
@@ -61,6 +119,98 @@ $user->getName();
 $user->getEmail();
 \$user->getAvatar();
 
+---
+
+# login with facebook:
+
+go to:
+
+developers.facebook.com
+
+register, and create an app name. you get an ID, and a secret. This ones should you fill in your .env file.
+
+There is a products section : Facebook login
+
+## in services.php:
+
+'facebook' => [
+'client_id' => env('FACEBOOK_CLIENT_ID'),
+'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+'redirect' => 'http://localhost:8000/login/facebook/callback',
+],
+
+## in .inv fill the data you got from developers.facebook.com:
+
+FACEBOOK_CLIENT_ID=
+
+FACEBOOK_CLIENT_SECRET=
+
+## in web.php:
+
+Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');
+
+Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
+
+## in login.blade.php:
+
+<a href="/login/facebook">Login with facebook</a>
+
+## in LoginController.php:
+
+public function redirectToProvider()
+{
+return Socialite::driver('facebook')->redirect();
+}
+
+    /**
+     * Obtain the user information from FB.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function handleProviderCallback()
+    {
+        $fbuser = Socialite::driver('facebook')->user();
+
+        //dd($fbuser);
+
+        //User create:
+        $user = User::firstOrCreate(
+            [
+
+            'provider_id' => $fbuser->getId()
+
+            ],
+            [
+            'email' => $fbuser->getEmail(),
+            'name' => $fbuser->getName(),
+            ]
+        );
+
+        //Log the user in:
+        auth()->login($user, true);
+
+        //redirect to dashboard
+        return redirect('home');
+    }
+
+## in User.php
+
+add 'provider_id' to fillable, or make a:
+
+`protected \$guarded=[];`
+
+## in database/migrations/user:
+
+\$table->string('password')->nullable();
+
+\$table->string('provider_id')->nullable();
+
+### Other providers:
+
+https://socialiteproviders.com/
+
+## Other interesting things from Laravel7.docs:
+
 Retrieving User Details From A Token (OAuth2)
 
 If you already have a valid access token for a user, you can retrieve their details using the userFromToken method:
@@ -72,6 +222,3 @@ Retrieving User Details From A Token And Secret (OAuth1)
 If you already have a valid pair of token / secret for a user, you can retrieve their details using the userFromTokenAndSecret method:
 
 $user = Socialite::driver('twitter')->userFromTokenAndSecret($token, \$secret);
-
-Other providers, not just the main ones:
-https://socialiteproviders.com/
