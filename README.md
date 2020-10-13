@@ -151,7 +151,9 @@ Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallba
 
 ## in login.blade.php:
 
-<a href="/login/facebook">Login with facebook</a>
+put:
+
+`<a href="/login/facebook">Login with facebook</a>`
 
 ## in LoginController.php:
 
@@ -195,7 +197,7 @@ return Socialite::driver('facebook')->redirect();
 
 add 'provider_id' to fillable, or make a:
 
-`protected \$guarded=[];`
+`protected $guarded=[];`
 
 ## in database/migrations/user:
 
