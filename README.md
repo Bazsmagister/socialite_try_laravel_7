@@ -8,35 +8,32 @@ https://laracasts.com/series/learn-socialite/episodes/1
 
 `composer require laravel/socialite`
 
-4.4.1
+it installed: 4.4.1
 
--   Installing league/oauth1-client (1.7.0): Downloading (100%)
--   Installing laravel/socialite (v4.4.1): Downloading (100%)
-
-https://laravel.com/docs/7.x/socialite
+(Installing league/oauth1-client (1.7.0): Downloading (100%))
+(Installing laravel/socialite (v4.4.1): Downloading (100%))
 
 # login with Github
 
 go to:
 
-github.com=yourpage
+github.com/yourpage
+
 settings
+
 developer settings
+
 OAuth apps
+
 New OAuth app
+
 fill the needed data
-register application
 
 register, and create an app name. you get an ID, and a secret. This ones should you fill in your .env file.
 
 ## in config/services.php add for github for example
 
-'github' => [
-'client_id' => env('GITHUB_CLIENT_ID'),
-'client_secret' => env('GITHUB_CLIENT_SECRET'),
-'redirect' => 'http://localhost:8000/login/github/callback', ],
-
-## in. env:
+`'github' => [ 'client_id' => env('GITHUB_CLIENT_ID'), 'client_secret' => env('GITHUB_CLIENT_SECRET'), 'redirect' => 'http://localhost:8000/login/github/callback', ],`
 
 ## in .inv fill the data you got from github:
 
@@ -52,10 +49,11 @@ GITHUB_CLIENT_SECRET=
 
 `npm install && npm run dev`
 
-(it installs vue-template-compiler)
+(it installs vue-template-compiler for me also)
 
 ## in App\Http\Controllers\Auth\LoginController.php:
 
+`
 public function redirectToProvider()
 {
 return Socialite::driver('github')->redirect();
@@ -89,7 +87,7 @@ public function handleProviderCallback()
         return redirect('home');
     }
 
----
+`
 
 ## in routes add:
 
