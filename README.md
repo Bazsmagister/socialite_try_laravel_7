@@ -6,6 +6,27 @@ https://laravel.com/docs/7.x/socialite
 
 https://laracasts.com/series/learn-socialite/episodes/1
 
+git clone https://github.com/Bazsmagister/socialite_try_laravel_7.git
+
+cd [into_the_cloned_repo]
+
+`composer install`
+
+//linux
+
+`cp .env.example .env`
+
+//windows
+`copy .env.example .env`
+
+edit .env file with database credentials
+
+`php artisan key:generate`
+
+`php artisan migrate`
+
+`php artisan serve`
+
 `composer require laravel/socialite`
 
 it installed: 4.4.1
